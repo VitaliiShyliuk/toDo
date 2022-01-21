@@ -1,5 +1,6 @@
 const myUL = document.querySelector(".tasks-ul");
 const myButton = document.querySelector(".form-task__button");
+const myInput = document.querySelector(".form-task__input-text");
 
 document.addEventListener(
   "DOMContentLoaded",
@@ -17,7 +18,8 @@ function filterArrayTasksLocalStorage(array, filter) {
   saveTasksLocalStorage(array.filter((task) => task.body !== filter));
 }
 
-myButton.addEventListener("click", addTaskData);
+myButton.addEventListener("click", handleClick);
+myInput.addEventListener("keydown", handleKey);
 myUL.addEventListener("click", handleDone);
 myUL.addEventListener("click", handleRemove);
 
@@ -31,16 +33,33 @@ function handleRemove(event) {
   }
 }
 
-function addTaskData(event) {
-  if (validation(event.target.previousElementSibling.value.trim())) {
-    const task = {
-      body: event.target.previousElementSibling.value.trim(),
-      done: false,
-    };
+function handleClick(event) {
+  const inputValue = event.target.previousElementSibling.value.trim();
+  if (validation(inputValue)) {
+    const task = createTask(inputValue);
     event.target.previousElementSibling.value = "";
     addToArrayTasksLocalStorage(task);
     addTasksHTMLtoHTML(arrayTasksFromLocalStorage());
   }
+}
+
+function handleKey(event) {
+  if (event.key === "Enter") {
+    const inputValue = event.target.value.trim();
+    if (validation(inputValue)) {
+      const task = createTask(inputValue);
+      event.target.value = "";
+      addToArrayTasksLocalStorage(task);
+      addTasksHTMLtoHTML(arrayTasksFromLocalStorage());
+    }
+  }
+}
+
+function createTask(value) {
+  return {
+    body: value,
+    done: false,
+  };
 }
 
 function handleDone(event) {
@@ -72,8 +91,8 @@ function changeDoneData(content, bool) {
 
 function createTaskHTML(textContent, taskDone) {
   return `
-  <li class="tasts-ul__item task ${taskDone ? 'disabled-text' : ''}">
-  <input type="checkbox" class="task-checkbox" ${taskDone ? 'checked' : ''}/>
+  <li class="tasts-ul__item task ${taskDone ? "disabled-text" : ""}">
+  <input type="checkbox" class="task-checkbox" ${taskDone ? "checked" : ""}/>
   <span class="task-text">${textContent}</span>
   <span class="task-delete noselect">&#10006;</span>
   </li>
